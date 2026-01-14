@@ -34,7 +34,7 @@ This project uses Composer for PHP dependency management.
 ### 3. Clone the Repository
 Open your terminal or command prompt and clone the project:
 ```bash
-git clone <repository_url>
+git clone <https://github.com/manalisawant3107/Meeting-Hall-Booking-System.git>
 cd Booking-System
 ```
 
@@ -49,7 +49,6 @@ composer install
     ```bash
     copy .env.example .env
     ```
-    *(On Mac/Linux use `cp .env.example .env`)*
 
 2.  Open the `.env` file in a and configure your database settings:
     ```ini
@@ -61,7 +60,14 @@ composer install
     DB_PASSWORD=
     ```
     *Note: Leave password empty if you are using default XAMPP settings.*
+    Also Run this command if needed after changing in env file
 
+    ```bash
+    php artisan config:clear 
+      OR
+    php artisan config:cache
+    ```
+   
 ### 6. Generate Application Key
 Run this command to generate the unique app key:
 ```bash
