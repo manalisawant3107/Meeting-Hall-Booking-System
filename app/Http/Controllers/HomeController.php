@@ -27,7 +27,7 @@ class HomeController extends Controller
                 $query->where('capacity', '>=', $request->people);
             }
 
-            // Filter by Date (Reservation Logic)
+            // Filter by Date 
             if ($request->filled('date')) {
                 // Logic to filter unavailable halls would go here
             }
