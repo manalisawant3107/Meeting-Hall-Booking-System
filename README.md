@@ -39,6 +39,13 @@ cd MEETING-HALL-BOOKING-SYSTEM
 ```
 
 ### 4. Install Backend Dependencies
+
+Before running this command make sure in C:\xammp\php\php.ini  file 
+remove semicolon from this line
+;extension=zip  
+to this 
+extension=zip
+
 Run the following command to install the necessary PHP packages via Composer:
 ```bash
 composer install
