@@ -35,7 +35,7 @@ This project uses Composer for PHP dependency management.
 Open your terminal or command prompt and clone the project:
 ```bash
 git clone <https://github.com/manalisawant3107/Meeting-Hall-Booking-System.git>
-cd Booking-System
+cd MEETING-HALL-BOOKING-SYSTEM
 ```
 
 ### 4. Install Backend Dependencies
