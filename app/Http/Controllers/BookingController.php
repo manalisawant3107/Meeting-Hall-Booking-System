@@ -52,10 +52,7 @@ class BookingController extends Controller
         $hallEnd = \Carbon\Carbon::parse($hall->end_time);
 
         // Check if request time is strictly within operating hours
-        // Note: Using format('H:i') to compare time parts only might be safer if dates differ, 
-        // but Carbon comparison works if we set date to same day. 
-        // Simpler: Compare H:i strings or standard comparison if created from time strings?
-        // Let's use string comparison for time:
+        
         if ($start < $hall->start_time || $end > $hall->end_time) {
              return response()->json(['available' => false, 'message' => "Booking time must be within operating hours ({$hall->start_time} - {$hall->end_time})."]);
         }
