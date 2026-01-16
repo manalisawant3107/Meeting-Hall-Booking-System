@@ -91,7 +91,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">Date</label>
-                            <input type="date" name="booking_date" class="form-control" required min="{{ date('Y-m-d') }}" value="{{ request('date') }}">
+                            <input type="date" name="booking_date" class="form-control" required min="{{ date('Y-m-d') }}" value="{{ request('start_date') ?? request('booking_date') }}">
                         </div>
                         
                         <div class="row g-3 mb-3">
@@ -201,16 +201,22 @@
             const end = document.querySelector('input[name="end_time"]').value;
             
             if(start && end) {
-                // Calculate hours logic
                 const startDate = new Date("2000-01-01 " + start);
                 const endDate = new Date("2000-01-01 " + end);
                 
-                let diff = (endDate - startDate) / 1000 / 60 / 60; // hours
+                let diffInMinutes = (endDate - startDate) / 1000 / 60;
                 
-                if (diff < 0) diff = 0; // handle wrap around or invalid
+                if (diffInMinutes <= 0) {
+                    document.getElementById('totalCost').innerText = "$0.00";
+                    bookBtn.disabled = true;
+                    return;
+                }
 
-                const total = (diff * pricePerHour).toFixed(2);
+                const hours = diffInMinutes / 60;
+                const total = (hours * pricePerHour).toFixed(2);
                 document.getElementById('totalCost').innerText = "$" + total;
+            } else {
+                document.getElementById('totalCost').innerText = "$0.00";
             }
         }
     });

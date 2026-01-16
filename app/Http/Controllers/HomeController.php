@@ -27,17 +27,36 @@ class HomeController extends Controller
                 $query->where('capacity', '>=', $request->people);
             }
 
-            // Filter by Date 
-            if ($request->filled('date')) {
-                // Logic to filter unavailable halls would go here
+            // Filter by Date Range
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $startDate = \Carbon\Carbon::parse($request->start_date);
+                $endDate = \Carbon\Carbon::parse($request->end_date);
+
+                if ($startDate->gt($endDate)) {
+                    return back()->withErrors(['error' => 'Start date cannot be after end date.'])->withInput();
+                }
+
+                // Get all dates in the range
+                $datesInRange = [];
+                $tempDate = $startDate->copy();
+                while ($tempDate->lte($endDate)) {
+                    $datesInRange[] = $tempDate->format('l'); // Get day name
+                    $tempDate->addDay();
+                }
+                $datesInRange = array_unique($datesInRange);
+
+                // Filter halls that are available on ALL requested days of the week
+                // We use whereJsonContains or similar if available_days is cast to array
+                foreach ($datesInRange as $day) {
+                    $query->whereJsonContains('available_days', $day);
+                }
+            } elseif ($request->filled('start_date')) {
+                $day = \Carbon\Carbon::parse($request->start_date)->format('l');
+                $query->whereJsonContains('available_days', $day);
             }
 
-            // Return empty collection if no filters are applied
-            if ($request->anyFilled(['type', 'location', 'date', 'people'])) {
-                $halls = $query->paginate(9)->withQueryString();
-            } else {
-                $halls = \App\Models\Hall::whereRaw('0 = 1')->paginate(9); 
-            }
+            // Load all halls by default or with filters
+            $halls = $query->paginate(9)->withQueryString();
 
             // Dynamic Locations for Dropdown
             $locations = Hall::select('location')->distinct()->pluck('location');

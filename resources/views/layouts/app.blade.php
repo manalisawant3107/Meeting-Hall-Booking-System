@@ -68,7 +68,6 @@
         .btn-primary:hover {
             background-color: var(--secondary-color);
             border-color: var(--secondary-color);
-            transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
         }
 
@@ -77,6 +76,14 @@
             border: 1px solid rgba(0, 0, 0, 0.05);
             border-radius: 1rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color) !important;
+            cursor: pointer;
         }
 
         .form-control, .form-select {

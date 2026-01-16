@@ -9,6 +9,17 @@
         </div>
     @endif
 
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                    <li><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <!-- Hero Section -->
     <div class="text-center mb-5 mt-3">
         <h1 class="display-4 fw-bold mb-3">Find Your Perfect <span class="text-primary">Meeting Space</span></h1>
@@ -19,9 +30,9 @@
     <div class="card p-4 mb-5 border-0">
         <form action="{{ route('home') }}" method="GET" id="filterForm">
             <div class="row g-3">
-                <div class="col-md-3">
+                <div class="col-md-3 col-sm-6">
                     <label class="form-label"><i class="bi bi-grid-fill me-2"></i>Space Type</label>
-                    <select name="type" class="form-select">
+                    <select name="type" class="form-select w-100">
                         <option value="">Any Type</option>
                         <option value="conference" {{ request('type') == 'conference' ? 'selected' : '' }}>Conference Room</option>
                         <option value="training" {{ request('type') == 'training' ? 'selected' : '' }}>Training Hall</option>
@@ -38,10 +49,14 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label"><i class="bi bi-calendar-event-fill me-2"></i>Date</label>
-                    <input type="date" name="date" class="form-control" value="{{ request('date') }}" placeholder="Select Date" min="{{ date('Y-m-d') }}">
+                    <label class="form-label"><i class="bi bi-calendar-event-fill me-2"></i>Date Range</label>
+                    <div class="input-group">
+                        <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}" placeholder="Start" min="{{ date('Y-m-d') }}">
+                        <span class="input-group-text">to</span>
+                        <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}" placeholder="End" min="{{ date('Y-m-d') }}">
+                    </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2 col-sm-6">
                     <label class="form-label"><i class="bi bi-people-fill me-2"></i>People</label>
                     <input type="number" name="people" class="form-control" placeholder="Ex: 5" min="1" value="{{ request('people') }}">
                 </div>
@@ -49,7 +64,7 @@
             <div class="row mt-4">
                 <div class="col-12 text-end">
                     <button type="submit" class="btn btn-primary px-4"><i class="bi bi-search me-2"></i>Find Spaces</button>
-                    @if(request()->anyFilled(['type', 'location', 'date', 'people']))
+                    @if(request()->anyFilled(['type', 'location', 'start_date', 'end_date', 'people']))
                         <a href="{{ route('home') }}" class="btn btn-outline-secondary ms-2">Reset</a>
                     @endif
                 </div>
@@ -63,7 +78,7 @@
     <div class="row g-4" id="venuesList">
         @forelse($halls as $hall)
         <div class="col-12">
-            <div class="card overflow-hidden">
+            <div class="card overflow-hidden card-hover">
                 <div class="row g-0">
                     <div class="col-md-4">
                         <img src="{{ $hall->image ?? 'https://via.placeholder.com/800x600?text=No+Image' }}" 
@@ -107,7 +122,7 @@
                             <p class="text-muted small mb-3 text-truncate">{{ $hall->description }}</p>
 
                             <div class="mt-auto">
-                                <a href="{{ route('hall.show', ['id' => $hall->id] + request()->query()) }}" class="btn btn-primary w-100 stretched-link">View Details & Book</a>
+                                <a href="{{ route('hall.show', ['id' => $hall->id, 'start_date' => request('start_date'), 'end_date' => request('end_date')] + request()->query()) }}" class="btn btn-primary w-100 stretched-link">View Details & Book</a>
                             </div>
                         </div>
                     </div>
@@ -138,6 +153,16 @@
             placeholder: 'Select Locations',
             allowClear: true,
             width: '100%'
+        });
+
+        $('#filterForm').on('submit', function(e) {
+            const startDate = $('input[name="start_date"]').val();
+            const endDate = $('input[name="end_date"]').val();
+
+            if (startDate && endDate && startDate > endDate) {
+                e.preventDefault();
+                alert('Start date cannot be after end date.');
+            }
         });
     });
 </script>

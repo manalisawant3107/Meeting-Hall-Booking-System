@@ -53,7 +53,13 @@ class BookingController extends Controller
 
         // Check if request time is strictly within operating hours
         
-        if ($start < $hall->start_time || $end > $hall->end_time) {
+        // 2. Validate Operating Hours
+        $reqStart = \Carbon\Carbon::parse($start);
+        $reqEnd = \Carbon\Carbon::parse($end);
+        $hallStart = \Carbon\Carbon::parse($hall->start_time);
+        $hallEnd = \Carbon\Carbon::parse($hall->end_time);
+
+        if ($reqStart->lt($hallStart) || $reqEnd->gt($hallEnd)) {
              return response()->json(['available' => false, 'message' => "Booking time must be within operating hours ({$hall->start_time} - {$hall->end_time})."]);
         }
 
@@ -94,7 +100,8 @@ class BookingController extends Controller
         }
 
         // 2. Validate Operating Hours
-        if ($start < $hall->start_time || $end > $hall->end_time) {
+        if (\Carbon\Carbon::parse($start)->lt(\Carbon\Carbon::parse($hall->start_time)) || 
+            \Carbon\Carbon::parse($end)->gt(\Carbon\Carbon::parse($hall->end_time))) {
             return back()->withErrors(['error' => "Booking time must be within operating hours ({$hall->start_time} - {$hall->end_time})."]);
         }
 
@@ -111,10 +118,18 @@ class BookingController extends Controller
             return back()->withErrors(['error' => 'Slot is not available for the selected time.']);
         }
 
-        // Calculate Cost
+        // Calculate Cost (Ensuring no negative values)
         $startTime = \Carbon\Carbon::parse($start);
         $endTime = \Carbon\Carbon::parse($end);
-        $hours = $endTime->diffInMinutes($startTime) / 60;
+        
+       
+        $minutes = abs($endTime->diffInMinutes($startTime));
+        
+        if ($endTime->lte($startTime)) {
+            return back()->withErrors(['error' => 'End time must be after start time.']);
+        }
+
+        $hours = $minutes / 60;
         $totalPrice = $hours * $hall->price_per_hour;
 
         Booking::create([
